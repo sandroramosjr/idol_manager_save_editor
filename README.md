@@ -1,0 +1,1 @@
+# idol_manager_save_editor
