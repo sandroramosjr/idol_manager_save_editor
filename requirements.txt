@@ -1,0 +1,2 @@
+# Optional development / packaging deps
+pyinstaller
