@@ -13,6 +13,7 @@ A small Python/Tkinter GUI for viewing and editing Idol Manager JSON save files.
 - Tkinter (usually included with standard Python installers)
 
 Optional (for creating a standalone executable):
+
 - `pyinstaller`
 
 ## Run locally
