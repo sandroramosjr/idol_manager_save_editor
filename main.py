@@ -393,20 +393,43 @@ class IdolManagerEditor(tk.Tk):
             if param.get("type") not in PARAM_TYPES:
                 continue
 
+            # Create a centered, symmetric row with a label, a slider for the current value,
+            # a numeric display, a MAX button for the value, then the potential and its MAX.
             row = ttk.Frame(self.param_frame)
-            row.pack(fill="x", pady=2)
+            row.pack(fill="x", pady=6)
             self.param_rows.append(row)
 
-            ttk.Label(row, text=f"{PARAM_TYPES[param.get('type')]}:").pack(side="left")
+            name_label = ttk.Label(row, text=f"{PARAM_TYPES[param.get('type')]}:")
+            name_label.pack(side="left", padx=(4, 8))
 
+            # Current value variable and display
             value_var = tk.IntVar(value=int(param.get("_val", 0) or 0))
-            potential_var = tk.IntVar(value=int(param.get("potential", 0) or 0))
+            value_display = ttk.Label(row, text=str(value_var.get()), width=4, anchor="center")
 
-            ttk.Entry(row, textvariable=value_var, width=6).pack(side="left", padx=(6, 4))
-            ttk.Button(row, text="MAX", command=lambda value=value_var: value.set(100)).pack(side="left", padx=(0, 6))
-            ttk.Label(row, text="/").pack(side="left")
-            ttk.Entry(row, textvariable=potential_var, width=6).pack(side="left", padx=(4, 4))
-            ttk.Button(row, text="MAX", command=lambda cap=potential_var: cap.set(100)).pack(side="left", padx=(0, 10))
+            # Slider (centralized, symmetric)
+            slider = tk.Scale(row, from_=0, to=100, orient="horizontal", length=380, showvalue=0,
+                              variable=value_var)
+            slider.pack(side="left", padx=(0, 8), fill="x", expand=True)
+
+            value_display.pack(side="left", padx=(6, 8))
+
+            # MAX button for current value
+            ttk.Button(row, text="MAX", command=lambda v=value_var: v.set(100)).pack(side="left", padx=(0, 8))
+
+            # Potential value and MAX
+            potential_var = tk.IntVar(value=int(param.get("potential", 0) or 0))
+            ttk.Label(row, text="Potential:").pack(side="left", padx=(8, 6))
+            potential_entry = ttk.Entry(row, textvariable=potential_var, width=6)
+            potential_entry.pack(side="left")
+            ttk.Button(row, text="MAX", command=lambda p=potential_var: p.set(100)).pack(side="left", padx=(6, 10))
+
+            # keep the display in sync with the slider
+            def _make_trace(label, var):
+                def _trace(*_):
+                    label.config(text=str(var.get()))
+                return _trace
+
+            value_var.trace_add("write", _make_trace(value_display, value_var))
 
             self.parameter_vars[param.get("type")] = {"_val": value_var, "potential": potential_var}
 
